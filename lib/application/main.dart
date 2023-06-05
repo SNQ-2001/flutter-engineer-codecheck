@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_engineer_codecheck/root_screen.dart';
+import '../View/root_screen.dart';
 
 void main() {
   runApp(const MyApp());
