@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../entity/search_repository.dart';
 import '../network/api_client.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -11,21 +12,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final apiClient = APIClient();
+  final _apiClient = APIClient();
 
-  Future<void> fetchSearchRepository() async {
-    try {
-      final exampleData = await apiClient.getSearchRepository("flutter");
-      final totalCount = exampleData.totalCount;
-      print('$totalCount');
-    } catch (e) {
-      print('Error: $e');
-    }
+  bool _searchBoolean = false;
+
+  SearchRepository searchRepository = SearchRepository(
+    totalCount: 0,
+    incompleteResults: false,
+    items: [],
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        title: !_searchBoolean ?
+        Text(widget.title, style: const TextStyle(color: Colors.white)) :
+        Padding(padding: const EdgeInsets.all(5), child: _searchTextField()),
+          actions: !_searchBoolean ? [_searchIcon()] : [_clearIcon()]
+      ),
+      body: ListView.builder(
+        itemCount: searchRepository.items.length,
+        itemBuilder: (BuildContext context, int index) {
+          return _githubItem(searchRepository.items[index].name);
+        },
+      ),
+    );
   }
 
   Widget _searchTextField() {
     return TextField(
-      onSubmitted: (String value) { print("$value"); },
+      onSubmitted: (String value) { fetchSearchRepository(value); },
       autofocus: true,
       cursorColor: Colors.white,
       style: const TextStyle(
@@ -49,55 +67,43 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  var list = ["メッセージ", "メッセージ", "メッセージ", "メッセージ", "メッセージ",];
-
-  bool _searchBoolean = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: !_searchBoolean ?
-        Text(widget.title, style: const TextStyle(color: Colors.white)) :
-        Padding(padding: const EdgeInsets.all(5), child: _searchTextField()),
-          actions: !_searchBoolean ? [
-            IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: () {
-              setState(() {
-                _searchBoolean = true;
-              });
-            })
-          ] : [
-            IconButton(icon: const Icon(Icons.clear, color: Colors.white), onPressed: () {
-              setState(() {
-                _searchBoolean = false;
-              });
-            })
-          ]
-      ),
-      body: ListView.builder(
-        itemBuilder: (BuildContext context, int index) {
-          if (index >= list.length) {
-            list.addAll(["メッセージ","メッセージ","メッセージ","メッセージ",]);
-          }
-          return _messageItem(list[index]);
-        },
-      ),
-    );
+  Widget _searchIcon() {
+    return IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: () {
+      setState(() {
+        _searchBoolean = true;
+      });
+    });
   }
 
-  Widget _messageItem(String title) {
+  Widget _clearIcon() {
+    return IconButton(icon: const Icon(Icons.clear, color: Colors.white), onPressed: () {
+      setState(() {
+        _searchBoolean = false;
+      });
+    });
+  }
+
+  Widget _githubItem(String title) {
     return Container(
       decoration: const BoxDecoration(border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
       child: ListTile(
         title: Text(
           title,
-          style: TextStyle(color: Colors.black, fontSize: 18.0),
+          style: const TextStyle(color: Colors.black, fontSize: 18.0),
         ),
         onTap: () {
           print("onTap called.");
         },
       ),
     );
+  }
+
+  Future<void> fetchSearchRepository(String q) async {
+    try {
+      final data = await _apiClient.getSearchRepository(q);
+      setState(() => searchRepository = data);
+    } catch (e) {
+      print('エラー: $e');
+    }
   }
 }
