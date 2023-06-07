@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../entity/search_repository.dart';
 import '../network/api_client.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -15,7 +16,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _searchBoolean = false;
 
-  var list = ["メッセージ", "メッセージ", "メッセージ", "メッセージ", "メッセージ",];
+  SearchRepository searchRepository = SearchRepository(
+    totalCount: 0,
+    incompleteResults: false,
+    items: [],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +33,9 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: !_searchBoolean ? [_searchIcon()] : [_clearIcon()]
       ),
       body: ListView.builder(
+        itemCount: searchRepository.items.length,
         itemBuilder: (BuildContext context, int index) {
-          if (index >= list.length) {
-            list.addAll(["メッセージ","メッセージ","メッセージ","メッセージ",]);
-          }
-          return _githubItem(list[index]);
+          return _githubItem(searchRepository.items[index].name);
         },
       ),
     );
@@ -97,11 +100,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchSearchRepository(String q) async {
     try {
-      final exampleData = await _apiClient.getSearchRepository(q);
-      final totalCount = exampleData.totalCount;
-      print('$totalCount');
+      final data = await _apiClient.getSearchRepository(q);
+      setState(() => searchRepository = data);
     } catch (e) {
-      print('Error: $e');
+      print('エラー: $e');
     }
   }
 }
