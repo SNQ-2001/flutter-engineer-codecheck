@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_engineer_codecheck/view/indicator_screen.dart';
 import '../entity/search_repository.dart';
 import '../network/api_client.dart';
 
@@ -16,6 +17,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _searchBoolean = false;
 
+  bool visibleIndicator = false;
+
   SearchRepository searchRepository = SearchRepository(
     totalCount: 0,
     incompleteResults: false,
@@ -32,11 +35,17 @@ class _MyHomePageState extends State<MyHomePage> {
         Padding(padding: const EdgeInsets.all(5), child: _searchTextField()),
           actions: !_searchBoolean ? [_searchIcon()] : [_clearIcon()]
       ),
-      body: ListView.builder(
-        itemCount: searchRepository.items.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _githubItem(searchRepository.items[index].name);
-        },
+      body: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          ListView.builder(
+            itemCount: searchRepository.items.length,
+            itemBuilder: (BuildContext context, int index) {
+              return _githubItem(searchRepository.items[index].name);
+            },
+          ),
+          IndicatorScreen(visible: visibleIndicator)
+        ],
       ),
     );
   }
@@ -100,10 +109,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchSearchRepository(String q) async {
     try {
+      // ローディングを表示
+      setState(() { visibleIndicator = true; });
+      // GitHubのリポジトリ検索結果を取得
       final data = await _apiClient.getSearchRepository(q);
       setState(() => searchRepository = data);
-    } catch (e) {
-      print('エラー: $e');
+      // ローディングを非表示
+      setState(() { visibleIndicator = false; });
+    } catch (error) {
+      // ローディングを非表示
+      setState(() { visibleIndicator = false; });
+      // エラーが発生した場合はダイアログを表示
+      showDialog<void>(context: context, builder: (_) {
+        return AlertDialog(title: Text(error.toString()));
+      });
     }
   }
 }
