@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_engineer_codecheck/view/indicator_screen.dart';
+import 'package:flutter_engineer_codecheck/view/repository_detail_screen.dart';
 import '../entity/search_repository.dart';
 import '../network/api_client.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class RepositoryScreen extends StatefulWidget {
+  const RepositoryScreen({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<RepositoryScreen> createState() => _RepositoryScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _RepositoryScreenState extends State<RepositoryScreen> {
   final _apiClient = APIClient();
 
   bool _searchBoolean = false;
@@ -101,7 +102,10 @@ class _MyHomePageState extends State<MyHomePage> {
           style: const TextStyle(color: Colors.black, fontSize: 18.0),
         ),
         onTap: () {
-          print("onTap called.");
+          Navigator.push(context, MaterialPageRoute(
+            // （2） 実際に表示するページ(ウィジェット)を指定する
+              builder: (context) => RepositoryDetailScreen(repositoryName: title)
+          ));
         },
       ),
     );
