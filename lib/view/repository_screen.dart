@@ -42,7 +42,7 @@ class _RepositoryScreenState extends State<RepositoryScreen> {
           ListView.builder(
             itemCount: searchRepository.items.length,
             itemBuilder: (BuildContext context, int index) {
-              return _githubItem(searchRepository.items[index].name);
+              return _githubItem(searchRepository.items[index].fullName);
             },
           ),
           IndicatorScreen(visible: visibleIndicator)
