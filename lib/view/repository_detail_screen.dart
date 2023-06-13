@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import '../entity/search_repository.dart';
 
 class RepositoryDetailScreen extends StatefulWidget {
-  const RepositoryDetailScreen({super.key, required this.repositoryName});
+  const RepositoryDetailScreen({super.key, required this.repository});
 
-  final String repositoryName;
+  final Item repository;
 
   @override
   State<RepositoryDetailScreen> createState() => _RepositoryDetailScreenState();
@@ -15,10 +16,10 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text(widget.repositoryName, style: const TextStyle(color: Colors.white)),
+        title: Text(widget.repository.fullName, style: const TextStyle(color: Colors.white)),
       ),
       body: Center(
-        child: Text(widget.repositoryName),
+        child: Text(widget.repository.fullName),
       ),
     );
   }

@@ -42,7 +42,7 @@ class _RepositoryScreenState extends State<RepositoryScreen> {
           ListView.builder(
             itemCount: searchRepository.items.length,
             itemBuilder: (BuildContext context, int index) {
-              return _githubItem(searchRepository.items[index].fullName);
+              return _githubItem(searchRepository.items[index]);
             },
           ),
           IndicatorScreen(visible: visibleIndicator)
@@ -93,18 +93,26 @@ class _RepositoryScreenState extends State<RepositoryScreen> {
     });
   }
 
-  Widget _githubItem(String title) {
+  Widget _githubItem(Item repository) {
     return Container(
       decoration: const BoxDecoration(border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
       child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.white,
+          backgroundImage: NetworkImage(repository.owner.avatarUrl),
+        ),
         title: Text(
-          title,
-          style: const TextStyle(color: Colors.black, fontSize: 18.0),
+          repository.fullName,
+          style: const TextStyle(color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.w500)
+        ),
+        subtitle: Text(
+            repository.owner.login,
+            style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.normal)
         ),
         onTap: () {
           Navigator.push(context, MaterialPageRoute(
             // （2） 実際に表示するページ(ウィジェット)を指定する
-              builder: (context) => RepositoryDetailScreen(repositoryName: title)
+              builder: (context) => RepositoryDetailScreen(repository: repository)
           ));
         },
       ),
