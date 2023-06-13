@@ -81,6 +81,16 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
                     },
                   ),
                 ),
+
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.data_object),
+                    title: Text(widget.repository.language.toString()),
+                    onTap: () {
+                      _openUrl(widget.repository.languagesUrl);
+                    },
+                  ),
+                ),
               ],
             ),
           ),
