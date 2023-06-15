@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 class RepositoryScreen extends StatefulWidget {
   @override
-  _RepositoryScreenState createState() => _RepositoryScreenState();
+  State<RepositoryScreen> createState() => _RepositoryScreenState();
 }
 
 class _RepositoryScreenState extends State<RepositoryScreen> {
