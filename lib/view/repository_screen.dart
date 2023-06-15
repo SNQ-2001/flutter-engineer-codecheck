@@ -1,51 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_engineer_codecheck/state/view_state.dart';
 import 'package:flutter_engineer_codecheck/view/indicator_screen.dart';
 import 'package:flutter_engineer_codecheck/view/repository_detail_screen.dart';
 import '../entity/search_repository.dart';
-import '../network/api_client.dart';
+import 'package:provider/provider.dart';
 
 class RepositoryScreen extends StatefulWidget {
-  const RepositoryScreen({super.key, required this.title});
-
-  final String title;
-
   @override
-  State<RepositoryScreen> createState() => _RepositoryScreenState();
+  _RepositoryScreenState createState() => _RepositoryScreenState();
 }
 
 class _RepositoryScreenState extends State<RepositoryScreen> {
-  final _apiClient = APIClient();
-
-  bool _searchBoolean = false;
-
-  bool visibleIndicator = false;
-
-  SearchRepository searchRepository = SearchRepository(
-    totalCount: 0,
-    incompleteResults: false,
-    items: [],
-  );
-
   @override
   Widget build(BuildContext context) {
+
+    final ViewState viewState = Provider.of<ViewState>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: !_searchBoolean ?
-        Text(widget.title, style: const TextStyle(color: Colors.white)) :
+        title: !viewState.searchBoolean ?
+        const Text("GitHub Repository Search", style: TextStyle(color: Colors.white)) :
         Padding(padding: const EdgeInsets.all(5), child: _searchTextField()),
-          actions: !_searchBoolean ? [_searchIcon()] : [_clearIcon()]
+          actions: !viewState.searchBoolean ? [_searchIcon()] : [_clearIcon()]
       ),
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
           ListView.builder(
-            itemCount: searchRepository.items.length,
+            itemCount: viewState.searchRepository.items.length,
             itemBuilder: (BuildContext context, int index) {
-              return _githubItem(searchRepository.items[index]);
+              return _githubItem(viewState.searchRepository.items[index]);
             },
           ),
-          IndicatorScreen(visible: visibleIndicator)
+          IndicatorScreen(visible: viewState.visibleIndicator)
         ],
       ),
     );
@@ -78,18 +66,18 @@ class _RepositoryScreenState extends State<RepositoryScreen> {
   }
 
   Widget _searchIcon() {
+    final ViewState viewState = Provider.of<ViewState>(context);
+
     return IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: () {
-      setState(() {
-        _searchBoolean = true;
-      });
+      viewState.enableSearchMode();
     });
   }
 
   Widget _clearIcon() {
+    final ViewState viewState = Provider.of<ViewState>(context);
+
     return IconButton(icon: const Icon(Icons.clear, color: Colors.white), onPressed: () {
-      setState(() {
-        _searchBoolean = false;
-      });
+      viewState.disableSearchMode();
     });
   }
 
@@ -120,17 +108,18 @@ class _RepositoryScreenState extends State<RepositoryScreen> {
   }
 
   Future<void> fetchSearchRepository(String q) async {
+    final ViewState viewState = Provider.of<ViewState>(context);
+
     try {
       // ローディングを表示
-      setState(() { visibleIndicator = true; });
+      viewState.showIndicator();
       // GitHubのリポジトリ検索結果を取得
-      final data = await _apiClient.getSearchRepository(q);
-      setState(() => searchRepository = data);
+      viewState.fetchSearchRepository(q);
       // ローディングを非表示
-      setState(() { visibleIndicator = false; });
+      viewState.hideIndicator();
     } catch (error) {
       // ローディングを非表示
-      setState(() { visibleIndicator = false; });
+      viewState.hideIndicator();
       // エラーが発生した場合はダイアログを表示
       showDialog<void>(context: context, builder: (_) {
         return AlertDialog(title: Text(error.toString()));

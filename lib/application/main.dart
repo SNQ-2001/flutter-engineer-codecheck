@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_engineer_codecheck/state/view_state.dart';
 import '../view/repository_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(GitHubApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GitHubApp extends StatelessWidget {
+  final ViewState userState = ViewState();
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const RepositoryScreen(title: 'GitHub Repository Search'),
+      home: ChangeNotifierProvider<ViewState>(
+        create: (_) => ViewState(),
+        child: RepositoryScreen(),
+      )
     );
   }
 }
