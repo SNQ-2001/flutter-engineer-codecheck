@@ -40,8 +40,26 @@ class _RepositoryScreenState extends State<RepositoryScreen> {
   }
 
   Widget _searchTextField() {
+    final ViewState viewState = Provider.of<ViewState>(context);
+
     return TextField(
-      onSubmitted: (String value) { fetchSearchRepository(value); },
+      onSubmitted: (String value) async {
+        try {
+          // ローディングを表示
+          viewState.showIndicator();
+          // GitHubのリポジトリ検索結果を取得
+          await viewState.fetchSearchRepository(value);
+          // ローディングを非表示
+          viewState.hideIndicator();
+        } catch (error) {
+          // ローディングを非表示
+          viewState.hideIndicator();
+          // エラーが発生した場合はダイアログを表示
+          showDialog<void>(context: context, builder: (_) {
+            return AlertDialog(title: Text(error.toString()));
+          });
+        }
+      },
       autofocus: true,
       cursorColor: Colors.white,
       style: const TextStyle(
@@ -105,25 +123,5 @@ class _RepositoryScreenState extends State<RepositoryScreen> {
         },
       ),
     );
-  }
-
-  Future<void> fetchSearchRepository(String q) async {
-    final ViewState viewState = Provider.of<ViewState>(context);
-
-    try {
-      // ローディングを表示
-      viewState.showIndicator();
-      // GitHubのリポジトリ検索結果を取得
-      viewState.fetchSearchRepository(q);
-      // ローディングを非表示
-      viewState.hideIndicator();
-    } catch (error) {
-      // ローディングを非表示
-      viewState.hideIndicator();
-      // エラーが発生した場合はダイアログを表示
-      showDialog<void>(context: context, builder: (_) {
-        return AlertDialog(title: Text(error.toString()));
-      });
-    }
   }
 }
