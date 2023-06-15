@@ -6,8 +6,10 @@ import '../entity/search_repository.dart';
 import 'package:provider/provider.dart';
 
 class RepositoryScreen extends StatefulWidget {
+  const RepositoryScreen({Key? key}) : super(key: key);
+
   @override
-  _RepositoryScreenState createState() => _RepositoryScreenState();
+  State<RepositoryScreen> createState() => _RepositoryScreenState();
 }
 
 class _RepositoryScreenState extends State<RepositoryScreen> {
